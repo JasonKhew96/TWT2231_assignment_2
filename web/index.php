@@ -41,16 +41,16 @@ $app->register(new Csanquer\Silex\PdoServiceProvider\Provider\PDOServiceProvider
     )
 );
 
-// $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
-//     'db.options' => array(
-//        'driver'   => 'pgsql',
-//        'user' => $dbopts["user"],
-//        'password' => $dbopts["pass"],
-//        'host' => $dbopts["host"],
-//        'port' => $dbopts["port"],
-//        'dbname' => ltrim($dbopts["path"],'/')
-//        )
-// ));
+$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
+    'db.options' => array(
+       'driver'   => 'pgsql',
+       'user' => $dbopts["user"],
+       'password' => $dbopts["pass"],
+       'host' => $dbopts["host"],
+       'port' => $dbopts["port"],
+       'dbname' => ltrim($dbopts["path"],'/')
+       )
+));
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__.'/views', // The path to the templates, which is in our case points to /var/www/templates
