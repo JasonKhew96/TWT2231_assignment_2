@@ -1,0 +1,9 @@
+{
+    "require": {
+        "silex/silex": "~2.0",
+        "twig/twig": "^2.4",
+        "symfony/twig-bridge": "^4.0",
+        "csanquer/pdo-service-provider": "~1.1dev",
+        "doctrine/dbal": "~2.2"
+    }
+}
