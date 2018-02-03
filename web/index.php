@@ -27,29 +27,29 @@ $app['articles'] = array(
     ),
 );
 
+$dbopts = parse_url(getenv('DATABASE_URL'));
 $app->register(new Csanquer\Silex\PdoServiceProvider\Provider\PDOServiceProvider('pdo'),
-               array(
-                'pdo.server' => array(
-                    'driver'   => 'pgsql',
-                    'host'     => '127.0.0.1',
-                    'dbname'   => 'staff_payroll',
-                    'port'     => 5432,
-                    'user'     => 'postgres',
-                    'password' => 'toor',
-                   )
-               )
+    array(
+     'pdo.server' => array(
+        'driver'   => 'pgsql',
+        'user' => $dbopts["user"],
+        'password' => $dbopts["pass"],
+        'host' => $dbopts["host"],
+        'port' => $dbopts["port"],
+        'dbname' => ltrim($dbopts["path"],'/')
+        )
+    )
 );
 
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
-        'driver'    => 'pdo_pgsql',
-        'host'      => 'localhost',
-        'port'      => 5432,
-        'dbname'    => 'staff_payroll',
-        'user'      => 'postgres',
-        'password'  => 'toor',
-        'charset'   => 'utf8mb4',
-    ),
+       'driver'   => 'pgsql',
+       'user' => $dbopts["user"],
+       'password' => $dbopts["pass"],
+       'host' => $dbopts["host"],
+       'port' => $dbopts["port"],
+       'dbname' => ltrim($dbopts["path"],'/')
+       )
 ));
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
