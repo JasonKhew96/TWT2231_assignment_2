@@ -104,12 +104,12 @@ $app->get('/stafflist', function () use($app) {
         $stafflists[] = $row;
     }
 
-    return $app['twig']->render('database.twig', array(
+    return $app['twig']->render('stafflist.html.twig', array(
         'stafflists' => $stafflists
     ));
 
     // $stafflists = $app['db']->fetchAll('SELECT * FROM table');
-    // return $app['twig']->render('database.twig', array(
+    // return $app['twig']->render('stafflist.html.twig', array(
     //     'stafflists' => $stafflists
     // ));
 
