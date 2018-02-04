@@ -12,7 +12,7 @@ $app['debug'] = true;
 $dbopts = parse_url(getenv('DATABASE_URL'));
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
-        'driver'   => 'pgsql',
+        'driver'   => 'pdo_pgsql',
         'user' => $dbopts["user"],
         'password' => $dbopts["pass"],
         'host' => $dbopts["host"],
