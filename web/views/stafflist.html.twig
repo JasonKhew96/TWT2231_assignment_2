@@ -2,38 +2,43 @@
 {% block body %}
     <ul class="nav nav-tabs justify-content-center">
         <li class="nav-item">
-            <a class="nav-link" href="{{ app.url_generator.generate('index') }}">Home</a>
+            <a class="nav-link" href="{{ path('index') }}">Home</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="stafflist.php">Staff List</a>
+            <a class="nav-link active" href="{{ path('stafflist') }}">Staff List</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="profile.php">Profile</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="payroll.php">Payroll</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ app.url_generator.generate('login') }}">Login</a>
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <a class="nav-link" href="{{ path('logout') }}">Logout</a>
+            {% else %}
+                <a class="nav-link" href="{{ path('login') }}">Login</a>
+            {% endif %}
         </li>
     </ul>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Staff ID</th>
-                <th scope="col">First name</th>
-                <th scope="col">Last name</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for staff in stafflists %}
-            <tr>
-                <th scope="row">{{ staff.staff_id }}</th>
-                <td>{{ staff.first_name }}</td>
-                <td>{{ staff.last_name }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="row justify-content-center">
+        <div class="col-md-4 col-xl-4">
+            <table class="table table-striped ">
+                <thead>
+                    <tr>
+                        <th scope="col">Staff ID</th>
+                        <th scope="col">First name</th>
+                        <th scope="col">Last name</th>
+                        <th scope="col">Details</th>
+                        <th scope="col">Payrolls</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for staff in stafflists %}
+                    <tr href="#">
+                        <th scope="row">{{ staff.staff_id }}</th>
+                        <td>{{ staff.first_name }}</td>
+                        <td>{{ staff.last_name }}</td>
+                        <td><a href="./staff/{{ staff.staff_id }}" class="btn btn-primary btn-sm active" role="button">Details</a></td>
+                        <td><a href="./staffpayroll/{{ staff.staff_id }}" class="btn btn-primary btn-sm active" role="button">Payrolls</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}
