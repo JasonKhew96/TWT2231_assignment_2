@@ -8,28 +8,28 @@ $app = new Silex\Application();
 
 $app['debug'] = true;
 
-// $dbopts = parse_url(getenv('DATABASE_URL'));
-// $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
-//     'db.options' => array(
-//         'driver'   => 'pdo_pgsql',
-//         'user' => $dbopts["user"],
-//         'password' => $dbopts["pass"],
-//         'host' => $dbopts["host"],
-//         'port' => $dbopts["port"],
-//         'dbname' => ltrim($dbopts["path"], '/')
-//        )
-// ));
-
+$dbopts = parse_url(getenv('DATABASE_URL'));
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
-       'driver'   => 'pdo_pgsql',
-       'user' => 'postgres',
-       'password' => 'toor',
-       'host' => 'localhost',
-       'port' => 5432,
-       'dbname' => 'staff_payroll'
+        'driver'   => 'pdo_pgsql',
+        'user' => $dbopts["user"],
+        'password' => $dbopts["pass"],
+        'host' => $dbopts["host"],
+        'port' => $dbopts["port"],
+        'dbname' => ltrim($dbopts["path"], '/')
        )
 ));
+
+// $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
+//     'db.options' => array(
+//        'driver'   => 'pdo_pgsql',
+//        'user' => 'postgres',
+//        'password' => 'toor',
+//        'host' => 'localhost',
+//        'port' => 5432,
+//        'dbname' => 'staff_payroll'
+//        )
+// ));
 
 $app->register(new Silex\Provider\SessionServiceProvider());
 $app->register(new Silex\Provider\SecurityServiceProvider(), array(
