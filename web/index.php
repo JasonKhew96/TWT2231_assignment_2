@@ -1,7 +1,6 @@
 <?php
 use Symfony\Component\HttpFoundation\Request;
-
-// use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -9,28 +8,28 @@ $app = new Silex\Application();
 
 $app['debug'] = true;
 
-$dbopts = parse_url(getenv('DATABASE_URL'));
-$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
-    'db.options' => array(
-        'driver'   => 'pdo_pgsql',
-        'user' => $dbopts["user"],
-        'password' => $dbopts["pass"],
-        'host' => $dbopts["host"],
-        'port' => $dbopts["port"],
-        'dbname' => ltrim($dbopts["path"], '/')
-       )
-));
-
+// $dbopts = parse_url(getenv('DATABASE_URL'));
 // $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 //     'db.options' => array(
-//        'driver'   => 'pdo_pgsql',
-//        'user' => 'postgres',
-//        'password' => 'toor',
-//        'host' => 'localhost',
-//        'port' => 5432,
-//        'dbname' => 'staff_payroll'
+//         'driver'   => 'pdo_pgsql',
+//         'user' => $dbopts["user"],
+//         'password' => $dbopts["pass"],
+//         'host' => $dbopts["host"],
+//         'port' => $dbopts["port"],
+//         'dbname' => ltrim($dbopts["path"], '/')
 //        )
 // ));
+
+$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
+    'db.options' => array(
+       'driver'   => 'pdo_pgsql',
+       'user' => 'postgres',
+       'password' => 'toor',
+       'host' => 'localhost',
+       'port' => 5432,
+       'dbname' => 'staff_payroll'
+       )
+));
 
 $app->register(new Silex\Provider\SessionServiceProvider());
 $app->register(new Silex\Provider\SecurityServiceProvider(), array(
@@ -134,6 +133,27 @@ $app->get('/profile', function () use ($app) {
         'profile' => $profile
     ));
 })->bind('profile');
+
+$app->post('/profile/edit', function (Silex\Application $app, Request $request) {
+
+    $staff_id = $app->escape($request->get('staff_id'));
+    $first_name = $app->escape($request->get('first_name'));
+    $last_name = $app->escape($request->get('last_name'));
+    $dob = $app->escape($request->get('dob'));
+    $gender = $app->escape($request->get('gender'));
+    $email = $app->escape($request->get('email'));
+    $is_active = $app->escape($request->get('is_active'));
+    $addr = $app->escape($request->get('addr'));
+    $addr2 = $app->escape($request->get('addr2'));
+    $state = $app->escape($request->get('state'));
+    $city = $app->escape($request->get('city'));
+    $postal_code = $app->escape($request->get('postal_code'));
+    $phone_home = $app->escape($request->get('phone_home'));
+    $phone_personal = $app->escape($request->get('phone_personal'));
+
+    $count = $app['db']->executeUpdate("UPDATE staff SET first_name = '$first_name', last_name = '$last_name', dob = '$dob', gender = '$gender', email = '$email', is_active = '$is_active', addr = '$addr', addr2 = '$addr2', state = '$state', city = '$city', postal_code = '$postal_code', phone_home = '$phone_personal' WHERE staff_id = '$staff_id'");
+    return new Response("$count column updated. <script>setTimeout(function(){window.location.replace('/');}, 3000);</script>", 200);
+})->bind('profileEdit');
 
 $app->get('/payroll', function () use ($app) {
     $usr = $app['security.token_storage']->getToken()->getUser();

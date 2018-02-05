@@ -25,71 +25,95 @@
         </li>
     </ul>
     <div class="row justify-content-center">
-        <div class="col-10 col-md-4 col-xl-2">
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <th scope="row">Staff ID</th>
-                        <td>{{ profile['staff_id'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">First name</th>
-                        <td>{{ profile['first_name'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Last name</th>
-                        <td>{{ profile['last_name'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Date of Birth</th>
-                        <td>{{ profile['dob'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Gender</th>
-                        <td>{{ profile['gender'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">E-mail</th>
-                        <td>{{ profile['email'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Department</th>
-                        <td>{{ profile['depart_name'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Active?</th>
-                        <td>{{ profile['is_active'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Address 1</th>
-                        <td>{{ profile['addr'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Address 2</th>
-                        <td>{{ profile['addr2'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">District</th>
-                        <td>{{ profile['district'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">City</th>
-                        <td>{{ profile['city'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Postal Code</th>
-                        <td>{{ profile['postal_code'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Phone Home</th>
-                        <td>{{ profile['phone_home'] }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Phone Personal</th>
-                        <td>{{ profile['phone_personal'] }}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="col-10 col-md-4 col-xl-4">
+            <form action="{{ path('profileEdit') }}" method="post">
+                <table class="table" id="editTable">
+                    <input type="hidden" name="staff_id" value="{{ profile['staff_id'] }}">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Staff ID</th>
+                            <th>{{ profile['staff_id'] }}</th>
+                        </tr>
+                        <tr>
+                            <th scope="row">First name</th>
+                            <td><input name="first_name" value="{{ profile['first_name'] }}" class="form-control" autocomplete='given-name' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Last name</th>
+                            <td><input name="last_name" value="{{ profile['last_name'] }}" class="form-control" autocomplete='family-name' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date of Birth</th>
+                            <td><input name="dob" value="{{ profile['dob'] }}" class="form-control" type="date" required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Gender</th>
+                            <td>
+                                <select name="gender" class="form-control" required="required">
+                                    {% if profile['gender'] == 'M' %}
+                                        <option selected="selected">M</option>
+                                        <option>F</option>
+                                    {% elseif profile['gender'] == 'F' %}
+                                        <option>M</option>
+                                        <option selected="selected">F</option>
+                                    {% endif %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">E-mail</th>
+                            <td><input name="email" value="{{ profile['email'] }}" class="form-control" type="email" autocomplete='email' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Department</th>
+                            <td>{{ profile['depart_name'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Active?</th>
+                            <td>
+                                <select name="is_active" class="form-control" required="required">
+                                    {% if profile['is_active'] == 'Y' %}
+                                        <option selected="selected">Y</option>
+                                        <option>N</option>
+                                    {% elseif profile['is_active'] == 'N' %}
+                                        <option>Y</option>
+                                        <option selected="selected">N</option>
+                                    {% endif %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Address 1</th>
+                            <td><input name="addr" value="{{ profile['addr'] }}" class="form-control" autocomplete='address-line1' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Address 2</th>
+                            <td><input name="addr2" value="{{ profile['addr2'] }}" class="form-control" autocomplete='address-line2' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">State</th>
+                            <td><input name="state" value="{{ profile['state'] }}" class="form-control" autocomplete='address-level1' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">City</th>
+                            <td><input name="city" value="{{ profile['city'] }}" class="form-control" autocomplete='address-level2' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Postal Code</th>
+                            <td><input name="postal_code" value="{{ profile['postal_code'] }}" class="form-control" type="number" autocomplete='postal-code' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone Home</th>
+                            <td><input name="phone_home" value="{{ profile['phone_home'] }}" class="form-control" type="tel" autocomplete='tel-national' required="required"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone Personal</th>
+                            <td><input name="phone_personal" value="{{ profile['phone_personal'] }}" class="form-control" type="tel" autocomplete='tel-national' required="required"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
         </div>
     </div>
 {% endblock %}
