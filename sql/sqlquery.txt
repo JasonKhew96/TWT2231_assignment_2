@@ -1,0 +1,91 @@
+create database staff_payroll;
+
+\l
+\c staff_payroll
+\d
+
+create extension pgcrypto;
+
+create table department (
+    depart_id SERIAL PRIMARY KEY,
+    depart_name varchar(255) NOT NULL,
+    salary_rate numeric NOT NULL,
+    ot_rate numeric NOT NULL,
+    last_update timestamp NOT NULL
+);
+
+create table staff (
+    staff_id SERIAL PRIMARY KEY,
+    first_name varchar(255) NOT NULL,
+    last_name varchar(255) NOT NULL,
+    dob DATE NOT NULL,
+    gender CHAR(1) NOT NULL,
+    email varchar(255) NOT NULL,
+    depart_id int,
+    is_active CHAR(1) NOT NULL,
+    guid varchar(32),
+    addr varchar(255) NOT NULL,
+    addr2 varchar(255) NOT NULL,
+    state varchar(255) NOT NULL,
+    city varchar(255) NOT NULL,
+    postal_code CHAR(5) NOT NULL,
+    phone_home VARCHAR(12),
+    phone_personal VARCHAR(12),
+    last_update timestamp NOT NULL,
+    FOREIGN KEY (depart_id) REFERENCES department(depart_id)
+);
+
+create table account (
+    acc_id SERIAL PRIMARY KEY,
+    username varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
+    roles varchar(255) NOT NULL,
+    guid varchar(32),
+    staff_id int,
+    last_update timestamp NOT NULL,
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
+);
+
+create table payroll (
+    payroll_id SERIAL PRIMARY KEY,
+    staff_id int,
+    pay_date DATE NOT NULL,
+    ot_hrs int NOT NULL,
+    att_hrs int NOT NULL,
+    last_update timestamp NOT NULL,
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
+);
+
+insert into department values
+(DEFAULT,'depart_1',2,1,'2018-01-01 00:00:00'),
+(DEFAULT,'depart_2',3,2,'2018-01-01 00:00:00'),
+(DEFAULT,'depart_3',4,3,'2018-01-01 00:00:00');
+
+insert into staff(staff_id,first_name,last_name,dob,gender,email,depart_id,is_active,addr,addr2,state,city,postal_code,phone_home,phone_personal,last_update) values
+(DEFAULT,'aa','ff','1990-01-01','M','aaff@test.com',1,'Y','addr_1_1','addr_1_1','district_1','city_1','12345','60123456789','60123456789','2018-01-01 00:00:00'),
+(DEFAULT,'bb','gg','1990-01-02','F','bbgg@test.cof',1,'Y','addr_1_2','addr_1_2','district_2','city_2','12346','60123456790','60123456790','2018-01-01 00:00:00'),
+(DEFAULT,'cc','hh','1990-01-03','M','cchh@test.com',2,'Y','addr_1_3','addr_1_3','district_3','city_3','12347','60123456791','60123456791','2018-01-01 00:00:00'),
+(DEFAULT,'dd','ii','1990-01-04','F','ddii@test.cof',2,'N','addr_1_4','addr_1_4','district_4','city_4','12348','60123456792','60123456792','2018-01-01 00:00:00'),
+(DEFAULT,'ee','jj','1990-01-05','M','eejj@test.com',3,'N','addr_1_5','addr_1_5','district_5','city_5','12349','60123456793','60123456793','2018-01-01 00:00:00');
+
+insert into account(acc_id, username, password, roles, staff_id, last_update) values
+(DEFAULT,'admin',crypt('admin',gen_salt('bf')),'ROLE_ADMIN',NULL,'2018-01-01 00:00:00'),
+(DEFAULT,'aaff',crypt('aaff',gen_salt('bf')),'ROLE_USER',1,'2018-01-01 00:00:00'),
+(DEFAULT,'bbgg',crypt('bbgg',gen_salt('bf')),'ROLE_USER',2,'2018-01-01 00:00:00'),
+(DEFAULT,'cchh',crypt('cchh',gen_salt('bf')),'ROLE_USER',3,'2018-01-01 00:00:00'),
+(DEFAULT,'ddii',crypt('ddii',gen_salt('bf')),'ROLE_USER',4,'2018-01-01 00:00:00'),
+(DEFAULT,'eejj',crypt('eejj',gen_salt('bf')),'ROLE_USER',5,'2018-01-01 00:00:00');
+
+insert into payroll values
+(DEFAULT,1,'2017-09-01',5,5,'2018-01-01 00:00:00'),
+(DEFAULT,1,'2017-10-01',4,4,'2018-01-01 00:00:00'),
+(DEFAULT,1,'2017-11-01',3,5,'2018-01-01 00:00:00'),
+(DEFAULT,1,'2017-12-01',2,4,'2018-01-01 00:00:00'),
+(DEFAULT,1,'2018-01-01',1,5,'2018-01-01 00:00:00'),
+(DEFAULT,2,'2017-09-01',5,5,'2018-01-01 00:00:00'),
+(DEFAULT,2,'2017-10-01',4,4,'2018-01-01 00:00:00'),
+(DEFAULT,2,'2017-11-01',3,5,'2018-01-01 00:00:00'),
+(DEFAULT,2,'2017-12-01',2,4,'2018-01-01 00:00:00'),
+(DEFAULT,2,'2018-01-01',1,5,'2018-01-01 00:00:00');
+
+select (password = crypt('aaff', password)) from account;
