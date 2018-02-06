@@ -1,3 +1,4 @@
+{% set title = 'Profile' %}
 {% extends 'base.html.twig' %}
 {% block body %}
     <ul class="nav nav-tabs justify-content-center">
@@ -104,11 +105,11 @@
                         </tr>
                         <tr>
                             <th scope="row">Phone Home</th>
-                            <td><input name="phone_home" value="{{ profile['phone_home'] }}" class="form-control" type="tel" autocomplete='tel-national' required="required"></td>
+                            <td><input name="phone_home" value="{{ profile['phone_home'] }}" class="form-control" type="tel" autocomplete='tel-national' maxlength="10" required="required"></td>
                         </tr>
                         <tr>
                             <th scope="row">Phone Personal</th>
-                            <td><input name="phone_personal" value="{{ profile['phone_personal'] }}" class="form-control" type="tel" autocomplete='tel-national' required="required"></td>
+                            <td><input name="phone_personal" value="{{ profile['phone_personal'] }}" class="form-control" type="tel" autocomplete='tel-national' maxlength="10" required="required"></td>
                         </tr>
                     </tbody>
                 </table>

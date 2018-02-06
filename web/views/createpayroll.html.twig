@@ -1,0 +1,62 @@
+{% set title = 'Create Payroll Staff' ~ id %}
+{% extends 'base.html.twig' %}
+{% block body %}
+    <ul class="nav nav-tabs justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path('index') }}">Home</a>
+        </li>
+        {% if is_granted('ROLE_ADMIN') %}
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ path('stafflist') }}">Staff List</a>
+            </li>
+        {% elseif is_granted('ROLE_USER') %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('profile') }}">Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('payroll') }}">Payroll</a>
+            </li>
+        {% endif %}
+        <li class="nav-item">
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <a class="nav-link" href="{{ path('logout') }}">Logout</a>
+            {% else %}
+                <a class="nav-link" href="{{ path('login') }}">Login</a>
+            {% endif %}
+        </li>
+    </ul>
+    <div class="row justify-content-center">
+        <div class="col-md-4 col-xl-6">
+            <h4>Create payroll for Staff
+                {{ id }}:</h4>
+            <form action="{{ path('createpayrollaction') }}" method="post">
+                <input type="hidden" name="staff_id" value="{{ id }}">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Work hours</th>
+                            <th scope="col">Work pay rate</th>
+                            <th scope="col">OT hours</th>
+                            <th scope="col">OT pay rate</th>
+                            <th scope="col">Total salary</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="date" class="form-control" name="pay_date" required></td>
+                            <td><input type="number" class="form-control" name="att_hrs" placeholder="200" required></td>
+                            <td><input type="number" class="form-control" value="{{ salary_rate }}" disabled="disabled"></td>
+                            <td><input type="number" class="form-control" name="ot_hrs" placeholder="200" required></td>
+                            <td><input type="number" class="form-control" value="{{ ot_rate }}" disabled="disabled"></td>
+                            <td><input type="number" class="form-control" placeholder="0" disabled="disabled"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-group">
+                    <button type="submit" value="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

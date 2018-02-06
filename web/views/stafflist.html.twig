@@ -1,3 +1,4 @@
+{% set title = 'Staff List' %}
 {% extends 'base.html.twig' %}
 {% block body %}
     <ul class="nav nav-tabs justify-content-center">
@@ -29,12 +30,12 @@
                 </thead>
                 <tbody>
                 {% for staff in stafflists %}
-                    <tr href="#">
+                    <tr>
                         <th scope="row">{{ staff.staff_id }}</th>
                         <td>{{ staff.first_name }}</td>
                         <td>{{ staff.last_name }}</td>
-                        <td><a href="./staff/{{ staff.staff_id }}" class="btn btn-primary btn-sm active" role="button">Details</a></td>
-                        <td><a href="./staffpayroll/{{ staff.staff_id }}" class="btn btn-primary btn-sm active" role="button">Payrolls</a></td>
+                        <td><a href="{{ path('staff', {'id': staff.staff_id}) }}" class="btn btn-primary btn-sm active" role="button">Details</a></td>
+                        <td><a href="{{ path('staffpayroll', {'id': staff.staff_id}) }}" class="btn btn-primary btn-sm active" role="button">Payrolls</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -1,3 +1,4 @@
+{% set title = 'Staff ' ~ id %}
 {% extends 'base.html.twig' %}
 {% block body %}
 <ul class="nav nav-tabs justify-content-center">
@@ -26,7 +27,8 @@
 </ul>
     <div class="row justify-content-center">
         <div class="col-md-4 col-xl-6">
-            <table class="table table-striped ">
+            <a href="{{ path('createpayrollid', {'id': id}) }}" class="btn btn-primary btn-sm active" role="button">create</a>
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Date</th>
@@ -35,6 +37,7 @@
                         <th scope="col">OT hours</th>
                         <th scope="col">OT pay rate</th>
                         <th scope="col">Total salary</th>
+                        <th scope="col">Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,6 +49,7 @@
                         <td>{{ payroll.ot_hrs }}</td>
                         <td>{{ payroll.ot_rate }}</td>
                         <td>{{ (payroll.att_hrs*payroll.salary_rate)+(payroll.ot_hrs*payroll.ot_rate) }}</td>
+                        <td><a href="{{ path('deletepayroll', {'staff_id': id, 'id': payroll.payroll_id}) }}" class="btn btn-primary btn-sm active" role="button">Delete</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>

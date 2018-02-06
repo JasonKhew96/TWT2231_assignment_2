@@ -8,28 +8,28 @@ $app = new Silex\Application();
 
 $app['debug'] = true;
 
-$dbopts = parse_url(getenv('DATABASE_URL'));
-$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
-    'db.options' => array(
-        'driver'   => 'pdo_pgsql',
-        'user' => $dbopts["user"],
-        'password' => $dbopts["pass"],
-        'host' => $dbopts["host"],
-        'port' => $dbopts["port"],
-        'dbname' => ltrim($dbopts["path"], '/')
-       )
-));
-
+// $dbopts = parse_url(getenv('DATABASE_URL'));
 // $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 //     'db.options' => array(
-//        'driver'   => 'pdo_pgsql',
-//        'user' => 'postgres',
-//        'password' => 'toor',
-//        'host' => 'localhost',
-//        'port' => 5432,
-//        'dbname' => 'staff_payroll'
+//         'driver'   => 'pdo_pgsql',
+//         'user' => $dbopts["user"],
+//         'password' => $dbopts["pass"],
+//         'host' => $dbopts["host"],
+//         'port' => $dbopts["port"],
+//         'dbname' => ltrim($dbopts["path"], '/')
 //        )
 // ));
+
+$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
+    'db.options' => array(
+       'driver'   => 'pdo_pgsql',
+       'user' => 'postgres',
+       'password' => 'toor',
+       'host' => 'localhost',
+       'port' => 5432,
+       'dbname' => 'staff_payroll'
+       )
+));
 
 $app->register(new Silex\Provider\SessionServiceProvider());
 $app->register(new Silex\Provider\SecurityServiceProvider(), array(
@@ -68,10 +68,7 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 
 $app->get('/', function (Silex\Application $app) {
     return $app['twig']->render(
-        'index.html.twig',
-        array(
-            'title' => 'Home'
-        )
+        'index.html.twig'
     );
 })->bind('index');
 
@@ -83,7 +80,6 @@ $app->get('/login', function (Silex\Application $app, Request $request) {
     return $app['twig']->render(
         'login.html.twig',
         array(
-            'title' => 'Login',
             'error' => $app['security.last_error']($request),
             'last_username' => $app['session']->get('_security.last_username'),
         )
@@ -91,9 +87,8 @@ $app->get('/login', function (Silex\Application $app, Request $request) {
 })->bind('login');
 
 $app->get('/stafflist', function () use ($app) {
-    $stafflists = $app['db']->fetchAll('SELECT * FROM staff');
+    $stafflists = $app['db']->fetchAll('SELECT * FROM staff ORDER BY staff_id ASC');
     return $app['twig']->render('stafflist.html.twig', array(
-        'title' => 'Staff List',
         'stafflists' => $stafflists
     ));
 })->bind('stafflist');
@@ -104,7 +99,7 @@ $app->get('/staff/{id}', function (Silex\Application $app, $id) {
         $app->abort(404, "Staff $id could not be found");
     }
     return $app['twig']->render('staff.html.twig', array(
-        'title' => "Staff $id",
+        'id' => $id,
         'profile' => $profile
     ));
 })
@@ -112,24 +107,49 @@ $app->get('/staff/{id}', function (Silex\Application $app, $id) {
     ->bind('staff');
 
 $app->get('/staffpayroll/{id}', function (Silex\Application $app, $id) {
-    $payrolls = $app['db']->fetchAll("SELECT * FROM staff, account, payroll, department where staff.staff_id = '$id' AND staff.staff_id = account.staff_id AND staff.staff_id = payroll.staff_id AND department.depart_id = staff.depart_id");
-    if (!$payrolls) {
-        $app->abort(404, "Staff $id could not be found");
-    }
+    $payrolls = $app['db']->fetchAll("SELECT * FROM staff, account, payroll, department where staff.staff_id = '$id' AND staff.staff_id = account.staff_id AND staff.staff_id = payroll.staff_id AND department.depart_id = staff.depart_id ORDER BY pay_date DESC");
     return $app['twig']->render('staffpayroll.html.twig', array(
-            'title' => "Staff $id",
+            'id' => $id,
             'payrolls' => $payrolls
         ));
 })
         ->assert('id', '\d+')
         ->bind('staffpayroll');
 
+$app->get('/createpayroll/{id}', function (Silex\Application $app, $id) {
+    $result = $app['db']->fetchAssoc("SELECT salary_rate, ot_rate FROM staff, department where staff.staff_id = '$id' AND staff.depart_id = department.depart_id");
+    if (!$result) {
+        $app->abort(500, "Unexpected error.");
+    }
+    return $app['twig']->render('createpayroll.html.twig', array(
+            'id' => $id,
+            'salary_rate' => $result['salary_rate'],
+            'ot_rate' => $result['ot_rate']
+        ));
+})
+    ->assert('id', '\d+')
+    ->bind('createpayrollid');
+
+$app->post('/createpayroll', function (Silex\Application $app, Request $request) {
+    $staff_id = $app->escape($request->get('staff_id'));
+    $pay_date = $app->escape($request->get('pay_date'));
+    $att_hrs = $app->escape($request->get('att_hrs'));
+    $ot_hrs = $app->escape($request->get('ot_hrs'));
+
+    $count = $app['db']->executeUpdate("INSERT INTO payroll (staff_id, pay_date, att_hrs, ot_hrs, last_update) VALUES ('$staff_id', '$pay_date', '$att_hrs', '$ot_hrs', CURRENT_TIMESTAMP)");
+    return new Response("$count column updated. <script>setTimeout(function(){window.location.replace('/staffpayroll/$staff_id');}, 1000);</script>", 200);
+})->bind('createpayrollaction');
+
+$app->get('/deletepayroll/{staff_id}/{id}', function (Silex\Application $app, $id, $staff_id) {
+    $count = $app['db']->executeUpdate("DELETE FROM payroll WHERE payroll_id = '$id'");
+    return new Response("$count column updated. <script>setTimeout(function(){window.location.replace('/staffpayroll/$staff_id');}, 1000);</script>", 200);
+})->bind('deletepayroll');
+
 $app->get('/profile', function () use ($app) {
     $usr = $app['security.token_storage']->getToken()->getUser();
     $id = $usr->getUsername();
     $profile = $app['db']->fetchAssoc("SELECT * FROM staff, account, department where username = '$id' AND staff.staff_id = account.staff_id AND department.depart_id = staff.depart_id");
     return $app['twig']->render('profile.html.twig', array(
-        'title' => 'Profile',
         'profile' => $profile
     ));
 })->bind('profile');
@@ -151,14 +171,14 @@ $app->post('/profile/edit', function (Silex\Application $app, Request $request) 
     $phone_home = $app->escape($request->get('phone_home'));
     $phone_personal = $app->escape($request->get('phone_personal'));
 
-    $count = $app['db']->executeUpdate("UPDATE staff SET first_name = '$first_name', last_name = '$last_name', dob = '$dob', gender = '$gender', email = '$email', is_active = '$is_active', addr = '$addr', addr2 = '$addr2', state = '$state', city = '$city', postal_code = '$postal_code', phone_home = '$phone_personal' WHERE staff_id = '$staff_id'");
-    return new Response("$count column updated. <script>setTimeout(function(){window.location.replace('/');}, 3000);</script>", 200);
+    $count = $app['db']->executeUpdate("UPDATE staff SET first_name = '$first_name', last_name = '$last_name', dob = '$dob', gender = '$gender', email = '$email', is_active = '$is_active', addr = '$addr', addr2 = '$addr2', state = '$state', city = '$city', postal_code = '$postal_code', phone_home = '$phone_home', phone_personal = '$phone_personal' WHERE staff_id = '$staff_id'");
+    return new Response("$count column updated. <script>setTimeout(function(){window.location.replace('/profile');}, 1000);</script>", 200);
 })->bind('profileEdit');
 
 $app->get('/payroll', function () use ($app) {
     $usr = $app['security.token_storage']->getToken()->getUser();
     $id = $usr->getUsername();
-    $payrolls = $app['db']->fetchAll("SELECT * FROM staff, account, payroll, department where username = '$id' AND staff.staff_id = account.staff_id AND payroll.staff_id = staff.staff_id AND department.depart_id = staff.depart_id");
+    $payrolls = $app['db']->fetchAll("SELECT * FROM staff, account, payroll, department where username = '$id' AND staff.staff_id = account.staff_id AND payroll.staff_id = staff.staff_id AND department.depart_id = staff.depart_id ORDER BY pay_date DESC");
     return $app['twig']->render('payroll.html.twig', array(
         'title' => 'Payroll',
         'payrolls' => $payrolls
