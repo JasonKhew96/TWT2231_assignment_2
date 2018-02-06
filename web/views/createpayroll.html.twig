@@ -45,11 +45,11 @@
                     <tbody>
                         <tr>
                             <td><input type="date" class="form-control" name="pay_date" required></td>
-                            <td><input type="number" class="form-control" name="att_hrs" placeholder="200" required></td>
-                            <td><input type="number" class="form-control" value="{{ salary_rate }}" disabled="disabled"></td>
-                            <td><input type="number" class="form-control" name="ot_hrs" placeholder="200" required></td>
-                            <td><input type="number" class="form-control" value="{{ ot_rate }}" disabled="disabled"></td>
-                            <td><input type="number" class="form-control" placeholder="0" disabled="disabled"></td>
+                            <td><input type="number" id="att_hrs" class="form-control" name="att_hrs" placeholder="200" required></td>
+                            <td><input type="number" id="salary_rate" class="form-control" value="{{ salary_rate }}" disabled="disabled"></td>
+                            <td><input type="number" id="ot_hrs" class="form-control" name="ot_hrs" placeholder="200" required></td>
+                            <td><input type="number" id="ot_rate" class="form-control" value="{{ ot_rate }}" disabled="disabled"></td>
+                            <td><input type="number" id="total" class="form-control" placeholder="0" disabled="disabled"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -59,4 +59,5 @@
             </form>
         </div>
     </div>
+    <script src="/js/createpayroll.js"></script>
 {% endblock %}
